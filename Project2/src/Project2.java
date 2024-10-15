@@ -3,11 +3,10 @@ Jonathan Ortiz
 Purpose
  */
 
- */
- */
- */
-import java.util.scanner;
 
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Project2 {
     public static void main(String[] args) {
@@ -39,7 +38,7 @@ public class Project2 {
                     enterNumberBetween0And10(scanner);
                     break;
                 case 2:
-                    new Main().Exercise19_03();
+                    Exercise19_03();
                     break;
                 case 3:
                     System.out.println("Exiting the program. Goodbye!");
@@ -88,7 +87,7 @@ public class Project2 {
     }
 
     // Method for option 2: Exercise19_03 to remove duplicates from a list
-    public void Exercise19_03() {
+    public static void Exercise19_03() {
         // Create an ArrayList with duplicates
         ArrayList<Integer> list = new ArrayList<>();
         list.add(14);
@@ -123,4 +122,4 @@ public class Project2 {
     }
 }
 
-}
+
