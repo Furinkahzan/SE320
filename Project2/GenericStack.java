@@ -1,8 +1,7 @@
 /*
 *Purpose:Class given in assignment given
 * to modify tabnd work for an array class instead of an arraylist
-*
-
+*implemented in this class are part 1 and part 2.
  */
 import java.util.arraylist;
 import java.util.HashSet;
@@ -69,6 +68,15 @@ public class GenericStack<E> {
 
 
     public static <E> ArrayList<E> removeDuplicates(ArrayList<E> list){
-        /* Your implementation here */
+    //create hash to store unique elements
+        HashSet<E> set = new HashSet<>();
+        //create array to store new values
+        ArrayList<E> result = new ArrayList<>();
+
+        for (E element : list) {
+            if (!set.contains(element)) {
+                result.add(element);
+            }
     }
+        return result;
 }
