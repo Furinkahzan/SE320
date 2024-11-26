@@ -8,46 +8,73 @@ public class Project5 {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Display menu options
-        System.out.println("Choose an option:");
-        System.out.println("1: Calculate the number of days since your birth.");
-        System.out.println("2: Test the removeDuplicates method.");
-        int choice = scanner.nextInt();
+        try {
+            // Display menu options
+            System.out.println("Choose an option:");
+            System.out.println("1: Calculate the number of days since your birth.");
+            System.out.println("2: Test the removeDuplicates method.");
+            int choice = scanner.nextInt();
 
-        // Handle user choice
-        switch (choice) {
-            case 1:
-                // Option 1: Calculate days since birth
-                System.out.println("Enter your birth year: ");
-                int year = scanner.nextInt();
-                System.out.println("Enter your birth month (1-12): ");
-                int month = scanner.nextInt();
-                System.out.println("Enter your birth day (1-31): ");
-                int day = scanner.nextInt();
+            // Handle user choice
+            switch (choice) {
+                case 1:
+                    handleBirthDateCalculation(scanner);
+                    break;
+                case 2:
+                    handleRemoveDuplicates();
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please select either 1 or 2.");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Error: Please enter valid input.");
+        } finally {
+            scanner.close();
+        }
+    }
 
-                // Create Day objects for birthdate and today's date
-                Day birthDate = new Day(year, month, day);
-                Day currentDate = Day.today();
+    /**
+     * Handles Option 1: Calculate the number of days since birth.
+     *
+     * @param scanner the Scanner object for user input
+     */
+    private static void handleBirthDateCalculation(Scanner scanner) {
+        try {
+            System.out.println("Enter your birth year: ");
+            int year = scanner.nextInt();
+            System.out.println("Enter your birth month (1-12): ");
+            int month = scanner.nextInt();
+            System.out.println("Enter your birth day (1-31): ");
+            int day = scanner.nextInt();
 
-                // Calculate and display the number of days elapsed
-                int daysElapsed = birthDate.daysFrom(currentDate);
-                System.out.println("Number of days since your birth: " + Math.abs(daysElapsed));
-                break;
+            // Create Day objects for birthdate and today's date
+            Day birthDate = new Day(year, month, day);
+            Day currentDate = Day.today();
 
-            case 2:
-                // Option 2: Test removeDuplicates
-                // Example list with duplicates
-                List<String> list = new ArrayList<>(Arrays.asList("a", "b", "b", "c", "c", "c", "d"));
-                System.out.println("Original list: " + list);
+            // Calculate and display the number of days elapsed
+            int daysElapsed = birthDate.daysFrom(currentDate);
+            System.out.println("Number of days since your birth: " + Math.abs(daysElapsed));
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
 
-                // Remove duplicates and display the result
-                removeDuplicates(list);
-                System.out.println("List after removing duplicates: " + list);
-                break;
+    /**
+     * Handles Option 2: Remove duplicates from a sorted list.
+     */
+    private static void handleRemoveDuplicates() {
+        try {
+            // Example list with duplicates
+            List<String> list = new ArrayList<>(Arrays.asList("a", "b", "b", "c", "c", "c", "d"));
+            System.out.println("Original list: " + list);
 
-            default:
-                // Handle invalid input
-                System.out.println("Invalid choice. Please select either 1 or 2.");
+            // Remove duplicates and display the result
+            removeDuplicates(list);
+            System.out.println("List after removing duplicates: " + list);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Unexpected error: " + e.getMessage());
         }
     }
 
@@ -56,21 +83,48 @@ public class Project5 {
      * Precondition: The list must not be null, and its elements must be sorted.
      *
      * @param lst the list from which duplicates will be removed
+     * @throws IllegalArgumentException if the input list is null or not sorted
      */
-    public static void removeDuplicates(List lst) {
-        if (lst == null || lst.size() == 0) return; // Handle null or empty list
-
-        // Create a copy of the list to iterate over
-        List copy = new ArrayList(lst);
-        Iterator elements = copy.iterator();
-        Object pre = elements.next();
-
-        // Iterate through the list and remove duplicates
-        while (elements.hasNext()) {
-            Object nex = elements.next();
-            if (pre.equals(nex)) lst.remove(nex); // Remove duplicate element
-            else pre = nex; // Update the previous element
+    public static <T extends Comparable<T>> void removeDuplicates(List<T> lst) {
+        if (lst == null) {
+            throw new IllegalArgumentException("The list cannot be null.");
         }
+
+        if (!isSorted(lst)) {
+            throw new IllegalArgumentException("The list must be sorted to remove duplicates.");
+        }
+
+        try {
+            Iterator<T> iterator = lst.iterator();
+            if (!iterator.hasNext()) return;
+
+            T previous = iterator.next();
+            while (iterator.hasNext()) {
+                T current = iterator.next();
+                if (previous.equals(current)) {
+                    iterator.remove(); // Safely remove the current element
+                } else {
+                    previous = current; // Update the previous element
+                }
+            }
+        } catch (ConcurrentModificationException e) {
+            System.out.println("Error: Concurrent modification detected. Ensure no other thread modifies the list.");
+        }
+    }
+
+    /**
+     * Checks if a list is sorted in ascending order.
+     *
+     * @param lst the list to check
+     * @return true if the list is sorted, false otherwise
+     */
+    private static <T extends Comparable<T>> boolean isSorted(List<T> lst) {
+        for (int i = 1; i < lst.size(); i++) {
+            if (lst.get(i).compareTo(lst.get(i - 1)) < 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 
@@ -88,8 +142,13 @@ class Day {
      * @param year  the year
      * @param month the month (1-12)
      * @param day   the day (1-31)
+     * @throws IllegalArgumentException if any input is invalid
      */
     public Day(int year, int month, int day) {
+        if (year < 0 || month < 1 || month > 12 || day < 1 || day > 31) {
+            throw new IllegalArgumentException("Invalid date: Year, month, or day out of range.");
+        }
+
         this.year = year;
         this.month = month;
         this.day = day;
